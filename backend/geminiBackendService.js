@@ -1,6 +1,6 @@
 import { GoogleGenerativeAI } from '@google/generative-ai';
-import { Order } from './models/Order.js';
 import { INITIAL_ORDERS } from './seed.js';
+
 
 export const SYSTEM_INSTRUCTION = `
 You are Aria, the friendly, professional, and concise Indian customer support specialist for Aura Skincare.
@@ -69,28 +69,16 @@ function isCancellationIntent(text) {
   );
 }
 
-// Fetch order from MongoDB or fallback
-async function getOrderRecord(orderId, fallbackOrders = {}) {
-  let orderData = null;
-  try {
-    orderData = await Order.findOne({ order_id: orderId });
-  } catch (err) {
-    console.warn('MongoDB lookup warning:', err.message);
+// Fetch order from in-memory orders or mock initial data
+function getOrderRecord(orderId, fallbackOrders = {}) {
+  if (fallbackOrders && fallbackOrders[orderId]) {
+    return fallbackOrders[orderId];
   }
-
-  if (!orderData && fallbackOrders && fallbackOrders[orderId]) {
-    orderData = fallbackOrders[orderId];
-  }
-
-  if (!orderData) {
-    const found = INITIAL_ORDERS.find(o => o.order_id === orderId);
-    if (found) orderData = found;
-  }
-
-  return orderData;
+  const found = INITIAL_ORDERS.find(o => o.order_id === orderId);
+  return found || null;
 }
 
-// Handle AI Chat with Gemini 3.8 Flash + Backend Order Tools
+// Handle AI Chat with Gemini 1.5 Flash + Backend Order Tools
 export async function handleAiChat({ message, history = [], orders = {}, apiKey }) {
   const activeKey = apiKey || process.env.GEMINI_API_KEY;
   if (!activeKey) {
@@ -112,24 +100,9 @@ export async function handleAiChat({ message, history = [], orders = {}, apiKey 
     executedTool = { name: 'cancel_order', args: { order_id: targetId || 'UNKNOWN' } };
 
     if (targetId) {
-      const orderData = await getOrderRecord(targetId, orders);
+      const orderData = getOrderRecord(targetId, orders);
       if (orderData) {
         if (orderData.status === 'Processing') {
-          // Perform cancellation in MongoDB
-          try {
-            await Order.updateOne(
-              { order_id: targetId },
-              {
-                $set: {
-                  status: 'Cancelled',
-                  notes: 'Order cancelled by customer during support call.',
-                  is_cancellable: false
-                }
-              }
-            );
-          } catch (err) {
-            console.warn('MongoDB cancel update notice:', err.message);
-          }
 
           updatedOrder = {
             order_id: targetId,

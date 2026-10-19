@@ -3,18 +3,18 @@
 > **Datastraw Hiring Assignment:** Build an AI Voice CX Agent for a D2C Brand  
 > **Brand:** Aura Skincare (Premium Organic Indian Skincare)  
 > **Agent Persona:** Aria — Friendly, professional, and concise Indian customer support specialist  
-> **Architecture:** React 19 (Vite) + Node.js/Express REST API + MongoDB + Gemini 1.5 Flash Function Calling + Web Speech STT/TTS
+> **Architecture:** React 19 (Vite) + Node.js/Express REST API + In-Memory Mock Store + Gemini 1.5 Flash Function Calling + Web Speech STT/TTS
 
 ---
 
 ## 📋 Executive Overview & Actual Working System
 
-This project is a complete, full-stack, browser-based AI Voice Customer Support Agent built specifically for **Aura Skincare**. Evaluators can click **"Start Call"**, speak naturally with their microphone, and converse in real-time with **Aria**, an AI voice agent tailored with an Indian accent, strict brand policy guardrails, live database lookup & cancellation tools, and automatic post-call structured JSON analytics.
+This project is a complete, full-stack, browser-based AI Voice Customer Support Agent built specifically for **Aura Skincare**. Evaluators can click **"Start Call"**, speak naturally with their microphone, and converse in real-time with **Aria**, an AI voice agent tailored with an Indian accent, strict brand policy guardrails, instant order lookup & cancellation tools, and automatic post-call structured JSON analytics.
 
 ### ⚡ What Is Currently Running Right Now (Actual Working State)
 - **Frontend App (Port 5173):** Live React 19 application with interactive Voice Orb, real-time audio soundwaves, barge-in interruption handling, evaluator test order helper chips, live synchronized transcript, and brand policies drawer.
-- **Backend REST API (Port 5000):** Express.js server providing brand information, product catalog endpoints, order status lookups, and order cancellation with transactional state validation.
-- **Database (MongoDB):** Connected to MongoDB (`mongodb://127.0.0.1:27017/aura_skincare`), auto-seeding mock orders and products on startup, and dynamically saving cancellations in real-time.
+- **Backend REST API (Port 5000):** Express.js server providing brand information, product catalog endpoints, order status lookups, and order cancellation with state validation.
+- **Data Store (In-Memory Mock):** Pure zero-setup mock dataset (`ORD-101`, `ORD-102`, `ORD-103`), with real-time state mutation for cancellations and immediate resets.
 - **Dual AI Engine:** Gemini 1.5 Flash with tool declarations (`get_order_details`, `cancel_order`) paired with a deterministic client-side simulation engine so evaluators can test 100% of the functionality immediately even with or without an API key.
 
 ---

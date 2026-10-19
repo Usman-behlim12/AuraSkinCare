@@ -2,7 +2,7 @@ import React from 'react';
 import { Mic, MicOff, PhoneCall, PhoneOff, Volume2, Sparkles, Loader2, Square } from 'lucide-react';
 
 export default function VoiceAgentOrb({
-  status, // 'Idle' | 'Listening' | 'Thinking' | 'Speaking'
+  status,
   isCallActive,
   onStartCall,
   onEndCall,
@@ -49,7 +49,7 @@ export default function VoiceAgentOrb({
           {status === 'Speaking' && <Volume2 size={48} className="orb-icon speaking-bounce" />}
         </div>
 
-        {/* Dynamic soundwaves during speaking or listening */}
+
         {(status === 'Speaking' || status === 'Listening') && (
           <div className="soundwave-bars">
             <span className="wave-bar bar-1"></span>

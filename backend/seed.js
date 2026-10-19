@@ -1,11 +1,6 @@
-import mongoose from 'mongoose';
-import dotenv from 'dotenv';
-import { Order } from './models/Order.js';
-import { Product } from './models/Product.js';
+// Aura Skincare Initial Mock Seed Dataset
+// Used for in-memory store in backend and tests
 
-dotenv.config();
-
-const MONGO_URI = process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/aura_skincare';
 
 export const INITIAL_ORDERS = [
   {
@@ -105,31 +100,11 @@ export const INITIAL_PRODUCTS = [
   }
 ];
 
-export async function seedDatabase() {
-  try {
-    await mongoose.connect(MONGO_URI);
-    console.log(`Connected to MongoDB at ${MONGO_URI}`);
-
-    // Seed Orders
-    await Order.deleteMany({});
-    const ordersCreated = await Order.insertMany(INITIAL_ORDERS);
-    console.log(`✅ Seeded ${ordersCreated.length} orders into MongoDB.`);
-
-    // Seed Products
-    await Product.deleteMany({});
-    const productsCreated = await Product.insertMany(INITIAL_PRODUCTS);
-    console.log(`✅ Seeded ${productsCreated.length} products into MongoDB:`);
-    productsCreated.forEach(p => console.log(`   - [${p.product_id}] ${p.name} (${p.formatted_price})`));
-
-    await mongoose.disconnect();
-    console.log('MongoDB seed completed successfully.');
-  } catch (err) {
-    console.error('Seed error:', err);
-    process.exit(1);
-  }
+export function getInitialOrders() {
+  return JSON.parse(JSON.stringify(INITIAL_ORDERS));
 }
 
-// Run directly if called via node
-if (process.argv[1]?.endsWith('seed.js')) {
-  seedDatabase();
+export function getInitialProducts() {
+  return JSON.parse(JSON.stringify(INITIAL_PRODUCTS));
 }
+

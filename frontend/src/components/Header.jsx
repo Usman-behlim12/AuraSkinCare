@@ -1,7 +1,7 @@
 import React from 'react';
 import { Database, Key, ShieldCheck } from 'lucide-react';
 
-export default function Header({ onOpenApiKeyModal, onOpenPoliciesModal, hasApiKey, isMongoConnected }) {
+export default function Header({ onOpenApiKeyModal, onOpenPoliciesModal, hasApiKey }) {
   return (
     <header className="brand-header">
       <div className="brand-header-inner">
@@ -19,14 +19,14 @@ export default function Header({ onOpenApiKeyModal, onOpenPoliciesModal, hasApiK
         </div>
 
         <div className="header-actions">
-          {/* MongoDB Live Status Pill */}
+          {/* Mock Orders Dataset Status Pill */}
           <div 
             className="action-pill-btn"
-            title={isMongoConnected ? "Connected to live MongoDB database" : "Running on in-memory database"}
+            title="Running on built-in mock dataset (ORD-101, ORD-102, ORD-103)"
           >
-            <Database size={15} className={isMongoConnected ? "text-emerald" : "text-amber"} />
-            <span>{isMongoConnected ? 'MongoDB Live' : 'Database: Local'}</span>
-            <span className={`status-dot ${isMongoConnected ? 'dot-active' : 'dot-warning'}`}></span>
+            <Database size={15} className="text-emerald" />
+            <span>Mock Data: Active</span>
+            <span className="status-dot dot-active"></span>
           </div>
 
           <button

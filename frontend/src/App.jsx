@@ -32,10 +32,9 @@ export default function App() {
   const [transcript, setTranscript] = useState([]);
   const [interimTranscript, setInterimTranscript] = useState('');
   const [activeToolExecution, setActiveToolExecution] = useState(null);
-  const [isMongoConnected, setIsMongoConnected] = useState(false);
   const [isBackendAiConfigured, setIsBackendAiConfigured] = useState(false);
 
-  // Database State (dynamically fetched from MongoDB if available, with mock fallback)
+  // In-Memory Mock Database State (ORD-101, ORD-102, ORD-103)
   const [orderDatabase, setOrderDatabase] = useState(INITIAL_ORDER_DATABASE);
 
   // Modals & Configuration
@@ -77,15 +76,14 @@ export default function App() {
     initChatSession();
   }, [initChatSession]);
 
-  // Connect to MongoDB, fetch live orders and check backend AI status on startup
+  // Check backend status and load mock orders
   useEffect(() => {
-    async function loadMongoData() {
+    async function initData() {
       try {
         const [statusRes, aiStatusRes] = await Promise.all([
           checkBackendStatus(),
           checkBackendAiStatus()
         ]);
-        setIsMongoConnected(statusRes.connected && statusRes.mongo);
         setIsBackendAiConfigured(aiStatusRes.configured);
         if (statusRes.connected) {
           const res = await fetchLiveOrders();
@@ -93,11 +91,11 @@ export default function App() {
             setOrderDatabase(res.orders);
           }
         }
-      } catch (err) {
-        console.warn("Backend startup check:", err);
+      } catch {
+        // Fallback to local mock data
       }
     }
-    loadMongoData();
+    initData();
   }, []);
 
   // Configure Speech Service Callbacks
@@ -224,11 +222,9 @@ export default function App() {
 
     setActiveToolExecution(null);
 
-    // Sync live cancellation with MongoDB database if cancel_order tool was triggered
+    // Sync cancellation with backend mock store if cancel_order tool was triggered
     if (executedTool && executedTool.name === 'cancel_order' && executedTool.args?.order_id) {
-      cancelLiveOrder(executedTool.args.order_id, 'Cancelled via Voice CX').catch(err => {
-        console.warn("Live MongoDB cancellation sync notice:", err);
-      });
+      cancelLiveOrder(executedTool.args.order_id, 'Cancelled via Voice CX').catch(() => { });
     }
 
     // Append Aria message
@@ -333,7 +329,6 @@ export default function App() {
       {/* Brand Header */}
       <Header
         hasApiKey={isBackendAiConfigured || !!apiKey}
-        isMongoConnected={isMongoConnected}
         onOpenApiKeyModal={() => setIsApiKeyModalOpen(true)}
         onOpenPoliciesModal={() => setIsPoliciesOpen(true)}
       />

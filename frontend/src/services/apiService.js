@@ -1,4 +1,4 @@
-// API Service for live MongoDB integration
+// API Service for Aura Skincare Backend integration
 import { INITIAL_ORDER_DATABASE } from '../data/mockOrders';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
@@ -8,9 +8,9 @@ export async function checkBackendStatus() {
     const res = await fetch(`${API_BASE_URL}/health`, { signal: AbortSignal.timeout(2000) });
     if (!res.ok) return { connected: false };
     const data = await res.json();
-    return { connected: true, mongo: data.mongo === 'connected' };
+    return { connected: true, mode: data.mode || 'mock' };
   } catch {
-    return { connected: false, mongo: false };
+    return { connected: false, mode: 'mock' };
   }
 }
 
@@ -22,11 +22,12 @@ export async function fetchLiveOrders() {
     if (data.success && data.orders && Object.keys(data.orders).length > 0) {
       return { live: true, orders: data.orders };
     }
-  } catch (err) {
-    console.warn("Backend MongoDB not reachable, using local database fallback:", err.message);
+  } catch {
+    // Graceful fallback to initial mock orders
   }
   return { live: false, orders: INITIAL_ORDER_DATABASE };
 }
+
 
 export async function fetchLiveOrderDetails(orderId) {
   try {
@@ -68,8 +69,8 @@ export async function fetchLiveProducts() {
         return { live: true, products: data.products };
       }
     }
-  } catch (err) {
-    console.warn("Could not fetch live products from MongoDB:", err.message);
+  } catch {
+    // Graceful fallback
   }
   return { live: false, products: [] };
 }
