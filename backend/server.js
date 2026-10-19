@@ -1,8 +1,16 @@
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
+import path from 'path';
+import { fileURLToPath } from 'url';
+import fs from 'fs';
 import { INITIAL_ORDERS, INITIAL_PRODUCTS } from './seed.js';
 import { handleAiChat, handleAiSummary } from './geminiBackendService.js';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const distPath = path.join(__dirname, '../frontend/dist');
+
 
 dotenv.config();
 
@@ -215,7 +223,17 @@ app.post('/api/ai/summary', async (req, res) => {
   }
 });
 
+// Serve static frontend files in production if dist exists (Render fullstack support)
+if (fs.existsSync(distPath)) {
+  app.use(express.static(distPath));
+  app.get('*', (req, res, next) => {
+    if (req.path.startsWith('/api')) return next();
+    res.sendFile(path.join(distPath, 'index.html'));
+  });
+}
+
 // Start Server
-app.listen(PORT, () => {
-  console.log(`🚀 Aura Skincare Mock Backend running on http://localhost:${PORT}`);
+app.listen(PORT, "0.0.0.0", () => {
+  console.log(`Server running on port ${PORT}`);
 });
+
